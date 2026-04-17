@@ -1,8 +1,8 @@
 export interface NewsImage {
-    s: string;  // small
-    m: string;  // medium
-    l: string;  // large
-    hd: string; // high def
+    s: string;
+    m: string;
+    l: string;
+    hd: string;
 }
 
 export interface Cover {

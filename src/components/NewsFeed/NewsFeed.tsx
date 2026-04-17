@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
     IconChevronLeft,
     IconChevronRight,
-    IconMoodEmpty,
     IconAlertCircle,
     IconRefresh,
 } from '@tabler/icons-react';
@@ -10,6 +9,7 @@ import { useNewsFeed } from '../../hooks/useNewsFeed';
 import { NewsCard } from './NewsCard';
 import { NewsSkeleton } from '../Skeleton/NewsSkeleton';
 import { NewsFeedConfig } from '../../types/news';
+import { formatMonthYear, formatWeekdayDate } from '../../utils/formatDate';
 import { cn } from '../../utils/cn';
 
 interface NewsFeedProps {
@@ -27,28 +27,25 @@ export const NewsFeed = ({ config, className }: NewsFeedProps) => {
 
     const handlePageChange = async (newPage: number) => {
         if (newPage === page) return;
-
         setIsTransitioning(true);
         setPage(newPage);
-
-        // Плавное завершение анимации
         setTimeout(() => setIsTransitioning(false), 300);
-
-        // Скролл к началу блока
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const isFirstPage = page === 1;
     const isLastPage = data ? page >= data.totalPages : true;
 
+    const displayDate = data?.news[0]?.publishedAt || new Date().toISOString();
+    const monthYear = formatMonthYear(displayDate);
+    const weekdayDate = formatWeekdayDate(displayDate);
+
     // Состояние загрузки
     if (loading && !data) {
         return (
-            <div className={cn('max-w-4xl mx-auto', className)}>
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        {config.title}
-                    </h2>
+            <div className={cn('w-full max-w-[347px] md:max-w-[589px] mx-auto', className)}>
+                <div className="mb-4">
+                    <h2 className="text-xl md:text-2xl font-semibold text-gray-900">{config.title}</h2>
+                    <p className="text-sm text-gray-500">{monthYear}</p>
                 </div>
                 <NewsSkeleton count={3} showCover={config.showCoverAlways !== false} />
             </div>
@@ -58,23 +55,19 @@ export const NewsFeed = ({ config, className }: NewsFeedProps) => {
     // Состояние ошибки
     if (error) {
         return (
-            <div className={cn('max-w-4xl mx-auto', className)}>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
-                    {config.title}
-                </h2>
-                <div className="flex flex-col items-center justify-center py-12 md:py-16 text-center bg-white rounded-3xl border border-gray-100">
-                    <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
-                        <IconAlertCircle size={32} className="text-red-500" />
+            <div className={cn('w-full max-w-[347px] md:max-w-[589px] mx-auto', className)}>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 text-gray-900">{config.title}</h2>
+                <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-2xl border border-gray-100">
+                    <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-3">
+                        <IconAlertCircle size={24} className="text-red-500" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        Ошибка загрузки
-                    </h3>
-                    <p className="text-gray-500 max-w-md mb-6">{error}</p>
+                    <h3 className="text-base font-medium text-gray-900 mb-1">Ошибка загрузки</h3>
+                    <p className="text-sm text-gray-500 mb-4">{error}</p>
                     <button
                         onClick={refetch}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-[#1E7B48] text-white rounded-full hover:bg-[#166035] transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-[#1E7B48] text-white text-sm rounded-full hover:bg-[#166035] transition-colors"
                     >
-                        <IconRefresh size={18} />
+                        <IconRefresh size={16} />
                         <span>Попробовать снова</span>
                     </button>
                 </div>
@@ -85,159 +78,88 @@ export const NewsFeed = ({ config, className }: NewsFeedProps) => {
     // Пустое состояние
     if (data && data.news.length === 0) {
         return (
-            <div className={cn('max-w-4xl mx-auto', className)}>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
-                    {config.title}
-                </h2>
-                <div className="flex flex-col items-center justify-center py-12 md:py-16 text-center bg-white rounded-3xl border border-gray-100">
-                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                        <IconMoodEmpty size={40} className="text-gray-300" />
-                    </div>
-                    <h3 className="text-xl font-medium text-gray-900 mb-2">
-                        Новостей пока нет
-                    </h3>
-                    <p className="text-gray-500">
-                        Загляните позже, здесь обязательно что-то появится
-                    </p>
+            <div className={cn('w-full max-w-[347px] md:max-w-[589px] mx-auto', className)}>
+                <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Важные новости</h2>
+                <p className="text-sm text-gray-500 mb-4">{weekdayDate}</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center bg-white rounded-2xl">
+                    <img
+                        src="/images/cart.png"
+                        alt="Нет новостей"
+                        className="w-32 h-32 md:w-40 md:h-40 object-contain mb-3"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                    />
+                    <p className="text-base font-bold text-gray-900">Новых новостей нет</p>
                 </div>
             </div>
         );
     }
-
-    // Основной контент
     return (
-        <div className={cn('max-w-4xl mx-auto', className)}>
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                    {config.title}
-                </h2>
-                {data && data.totalPages > 1 && (
-                    <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                        {page} / {data.totalPages}
-                    </span>
-                )}
+        <div className={cn('w-full max-w-[347px] md:max-w-[589px] mx-auto', className)}>
+            {/* Заголовок секции */}
+            <div className="mb-4">
+                <h2 className="text-xl md:text-2xl font-semibold text-gray-900">{config.title}</h2>
+                <p className="text-sm text-gray-500">{monthYear}</p>
             </div>
 
             {/* Список новостей */}
             <div
                 className={cn(
-                    'space-y-6 transition-opacity duration-300',
-                    isTransitioning && 'opacity-50'
+                    'space-y-6',
+                    isTransitioning && 'opacity-50 transition-opacity duration-300'
                 )}
             >
                 {data?.news.map((news, index) => (
-                    <NewsCard
-                        key={news.id}
-                        news={news}
-                        showCover={
-                            config.showCoverAlways !== false ? true : index === 0
-                        }
-                    />
+                    <div key={news.id}>
+                        <NewsCard
+                            news={news}
+                            showCover={config.showCoverAlways !== false || index === 0}
+                            isFirst={index === 0}
+                            newsIndex={index}
+                            sectionId={config.id}
+                        />
+
+                        {/* Разделитель между новостями */}
+                        {index < data.news.length - 1 && (
+                            <div className="border-b border-gray-100 mt-6" />
+                        )}
+                    </div>
                 ))}
             </div>
 
-            {/* Пагинация */}
+            {/* Пагинация - только стрелки справа */}
             {data && data.totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 md:gap-4 mt-8 pt-6 border-t border-gray-200">
-                    {/* Кнопка Назад */}
+                <div className="flex items-center justify-end gap-2 mt-6 pt-2">
                     <button
                         onClick={() => handlePageChange(page - 1)}
                         disabled={isFirstPage || isTransitioning}
                         className={cn(
-                            'flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full font-medium transition-all',
+                            'w-8 h-8 flex items-center justify-center rounded-full transition-all',
                             isFirstPage
                                 ? 'text-gray-300 cursor-not-allowed'
-                                : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+                                : 'text-gray-600 hover:bg-gray-100'
                         )}
+                        aria-label="Предыдущая страница"
                     >
-                        <IconChevronLeft size={20} />
-                        <span className="hidden sm:inline">Назад</span>
+                        <IconChevronLeft size={18} />
                     </button>
 
-                    {/* Номера страниц */}
-                    <div className="flex items-center gap-1">
-                        {generatePageNumbers(page, data.totalPages).map((pageNum, idx) => (
-                            <PageButton
-                                key={idx}
-                                pageNum={pageNum}
-                                currentPage={page}
-                                onPageChange={handlePageChange}
-                                disabled={isTransitioning}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Кнопка Вперёд */}
                     <button
                         onClick={() => handlePageChange(page + 1)}
                         disabled={isLastPage || isTransitioning}
                         className={cn(
-                            'flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full font-medium transition-all',
+                            'w-8 h-8 flex items-center justify-center rounded-full transition-all',
                             isLastPage
                                 ? 'text-gray-300 cursor-not-allowed'
-                                : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+                                : 'text-gray-600 hover:bg-gray-100'
                         )}
+                        aria-label="Следующая страница"
                     >
-                        <span className="hidden sm:inline">Вперёд</span>
-                        <IconChevronRight size={20} />
+                        <IconChevronRight size={18} />
                     </button>
                 </div>
             )}
         </div>
     );
-};
-
-// Компонент кнопки страницы
-interface PageButtonProps {
-    pageNum: number | '...';
-    currentPage: number;
-    onPageChange: (page: number) => void;
-    disabled?: boolean;
-}
-
-const PageButton = ({ pageNum, currentPage, onPageChange, disabled }: PageButtonProps) => {
-    if (pageNum === '...') {
-        return (
-            <span className="w-10 h-10 flex items-center justify-center text-gray-400">
-                •••
-            </span>
-        );
-    }
-
-    const isActive = pageNum === currentPage;
-
-    return (
-        <button
-            onClick={() => onPageChange(pageNum)}
-            disabled={disabled || isActive}
-            className={cn(
-                'w-10 h-10 rounded-full font-medium transition-all',
-                isActive
-                    ? 'bg-[#1E7B48] text-white cursor-default'
-                    : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
-            )}
-        >
-            {pageNum}
-        </button>
-    );
-};
-
-// Генерация номеров страниц с многоточием
-const generatePageNumbers = (
-    current: number,
-    total: number
-): (number | '...')[] => {
-    if (total <= 5) {
-        return Array.from({ length: total }, (_, i) => i + 1);
-    }
-
-    if (current <= 3) {
-        return [1, 2, 3, 4, '...', total];
-    }
-
-    if (current >= total - 2) {
-        return [1, '...', total - 3, total - 2, total - 1, total];
-    }
-
-    return [1, '...', current - 1, current, current + 1, '...', total];
 };

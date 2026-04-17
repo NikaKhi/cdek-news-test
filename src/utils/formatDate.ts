@@ -1,55 +1,40 @@
 /**
- * Форматирует дату в человекочитаемый вид
+ * Форматирует дату в формат "20 августа 2025"
  */
-export const formatDate = (dateString: string): string => {
+export const formatFullDate = (dateString: string): string => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    // Сегодня
-    if (diffDays === 0) {
-        return 'Сегодня';
-    }
-
-    // Вчера
-    if (diffDays === 1) {
-        return 'Вчера';
-    }
-
-    // В течение недели
-    if (diffDays < 7) {
-        return `${diffDays} ${getDayWord(diffDays)} назад`;
-    }
-
-    // Более недели - полная дата
     return date.toLocaleDateString('ru-RU', {
         day: 'numeric',
         month: 'long',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+        year: 'numeric',
     });
 };
 
 /**
- * Возвращает правильное склонение слова "день"
+ * Форматирует дату и время в формат "20 августа 16:30"
  */
-const getDayWord = (days: number): string => {
-    const lastDigit = days % 10;
-    const lastTwoDigits = days % 100;
+export const formatDateTime = (dateString: string): string => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleDateString('ru-RU', { month: 'long' });
+    const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    return `${day} ${month} ${time}`;
+};
 
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
-        return 'дней';
-    }
+/**
+ * Форматирует месяц и год "Август, 2025"
+ */
+export const formatMonthYear = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+};
 
-    if (lastDigit === 1) {
-        return 'день';
-    }
-
-    if (lastDigit >= 2 && lastDigit <= 4) {
-        return 'дня';
-    }
-
-    return 'дней';
+/**
+ * Форматирует день недели и дату "Среда, 20 августа"
+ */
+export const formatWeekdayDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
 };
 
 /**
