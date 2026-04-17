@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://1e14c3489fcb.vps.myjino.ru:5000/api/:path*"
+    }
+  ]
+}
