@@ -2,9 +2,10 @@
 
 Тестовое задание для стажировки Frontend-разработчик в СДЭК.
 
+
 ## 🚀 Демо
 
-🔗 [Ссылка на рабочий проект](https://your-username.github.io/cdek-news-test)
+🔗 **[Посмотреть работающую версию](https://cdek-news-internship.vercel.app)**
 
 ## 🛠 Технологический стек
 
