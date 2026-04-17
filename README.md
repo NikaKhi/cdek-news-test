@@ -4,7 +4,7 @@
 
 ## 🚀 Демо
 
-🔗 **[Посмотреть работающую версию](https://cdek-news-internship.vercel.app)**)
+🔗 **[Посмотреть работающую версию](https://cdek-news-internship.vercel.app)**
 
 ## 🛠 Технологический стек
 
